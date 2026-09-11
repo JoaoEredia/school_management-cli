@@ -59,4 +59,33 @@ public class AlunoDAO {
 
         return alunos;
     }
+    public void atualizar(Aluno aluno) {
+        String sql = "UPDATE alunos SET nome = ?, email = ?, cpf = ?, data_nascimento = ? WHERE id = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, aluno.getNome());
+            stmt.setString(2, aluno.getEmail());
+            stmt.setString(3, aluno.getCpf());
+            stmt.setDate(4, Date.valueOf(aluno.getDataNascimento()));
+            stmt.setInt(5, aluno.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar aluno: " + e.getMessage());
+        }
+    }
+    public void deletar(int id) {
+        String sql = "DELETE FROM alunos WHERE id = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar aluno: " + e.getMessage());
+        }
+    }
 }
