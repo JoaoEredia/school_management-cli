@@ -2,6 +2,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
+import dao.CursoDAO;
+import model.Curso;
 
 import dao.AlunoDAO;
 import model.Aluno;
@@ -12,6 +14,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         AlunoDAO alunoDAO = new AlunoDAO();
+        CursoDAO cursoDAO = new CursoDAO();
         int opcao = -1;
 
         System.out.println("=== SISTEMA DE GESTÃO DE ALUNOS ===");
@@ -22,6 +25,8 @@ public class Main {
             System.out.println("2 - Listar Alunos");
             System.out.println("3 - Atualizar Aluno");
             System.out.println("4 - Excluir Aluno");
+            System.out.println("5 - Cadastrar Curso");
+            System.out.println("6 - Listar Cursos");
             System.out.println("0 - Sair");
             System.out.println("-----------------------------");
             System.out.print("Escolha uma opção: ");
@@ -47,6 +52,12 @@ public class Main {
                     break;
                 case 4:
                     excluirAluno(scanner, alunoDAO);
+                    break;
+                case 5:
+                    cadastrarCurso(scanner, cursoDAO);
+                    break;
+                case 6:
+                    listarCursos(cursoDAO);
                     break;
                 case 0:
                     System.out.println("Encerrando o sistema...");
@@ -160,6 +171,41 @@ public class Main {
             }
         } else {
             System.out.println("Operação cancelada.");
+        }
+    }
+
+    private static void cadastrarCurso(Scanner scanner, CursoDAO cursoDAO) {
+        System.out.println("\n--- Cadastrar Curso ---");
+        System.out.print("Nome do Curso: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Sigla (ex: ADS, ENG): ");
+        String sigla = scanner.nextLine();
+
+        System.out.print("Carga Horária (h): ");
+        int cargaHoraria = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Descrição: ");
+        String descricao = scanner.nextLine();
+
+        Curso novoCurso = new Curso(nome, sigla, cargaHoraria, descricao);
+        try {
+            cursoDAO.cadastrar(novoCurso);
+        } catch (Exception e) {
+            System.err.println("Erro ao cadastrar curso: " + e.getMessage());
+        }
+    }
+
+    private static void listarCursos(CursoDAO cursoDAO) {
+        System.out.println("\n--- Lista de Cursos ---");
+        List<Curso> cursos = cursoDAO.listar();
+
+        if (cursos.isEmpty()) {
+            System.out.println("Nenhum curso cadastrado.");
+        } else {
+            for (Curso c : cursos) {
+                System.out.println(c);
+            }
         }
     }
 }
