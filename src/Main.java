@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Scanner;
 import dao.CursoDAO;
 import model.Curso;
+import dao.ProfessorDAO;
+import model.Professor;
 
 import dao.AlunoDAO;
 import model.Aluno;
@@ -13,6 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        ProfessorDAO professorDAO = new ProfessorDAO();
         AlunoDAO alunoDAO = new AlunoDAO();
         CursoDAO cursoDAO = new CursoDAO();
         int opcao = -1;
@@ -27,6 +30,8 @@ public class Main {
             System.out.println("4 - Excluir Aluno");
             System.out.println("5 - Cadastrar Curso");
             System.out.println("6 - Listar Cursos");
+            System.out.println("7 - Cadastrar Professor");
+            System.out.println("8 - Listar Professores");
             System.out.println("0 - Sair");
             System.out.println("-----------------------------");
             System.out.print("Escolha uma opção: ");
@@ -58,6 +63,12 @@ public class Main {
                     break;
                 case 6:
                     listarCursos(cursoDAO);
+                    break;
+                case 7:
+                    cadastrarProfessor(scanner, professorDAO);
+                    break;
+                case 8:
+                    listarProfessores(professorDAO);
                     break;
                 case 0:
                     System.out.println("Encerrando o sistema...");
@@ -208,4 +219,54 @@ public class Main {
             }
         }
     }
+    private static void cadastrarProfessor(Scanner scanner, ProfessorDAO professorDAO) {
+    scanner.nextLine(); // Limpa o buffer do teclado
+    System.out.println("\n--- Cadastrar Professor ---");
+
+    System.out.print("Nome: ");
+    String nome = scanner.nextLine();
+
+    System.out.print("Email: ");
+    String email = scanner.nextLine();
+
+    System.out.print("Especialidade (ex: Java, Banco de Dados): ");
+    String especialidade = scanner.nextLine();
+
+    System.out.print("Data de Admissão (dd/MM/yyyy) [deixe em branco para hoje]: ");
+    String dataStr = scanner.nextLine();
+
+    LocalDate dataAdmissao;
+    if (dataStr.trim().isEmpty()) {
+        dataAdmissao = LocalDate.now();
+    } else {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        dataAdmissao = LocalDate.parse(dataStr, formatter);
+    }
+
+    Professor professor = new Professor(nome, email, especialidade, dataAdmissao);
+    professorDAO.cadastrar(professor);
+}
+
+private static void listarProfessores(ProfessorDAO professorDAO) {
+    System.out.println("\n--- Lista de Professores ---");
+    List<Professor> lista = professorDAO.listar();
+
+    if (lista.isEmpty()) {
+        System.out.println("Nenhum professor encontrado.");
+        return;
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    for (Professor p : lista) {
+        System.out.printf("ID: %d | Nome: %s | Email: %s | Especialidade: %s | Admissão: %s%n",
+            p.getId(),
+            p.getNome(),
+            p.getEmail(),
+            p.getEspecialidade(),
+            p.getDataAdmissao().format(formatter)
+        );
+    }
+  }
+
 }
